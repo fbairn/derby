@@ -1,5 +1,6 @@
 #determine which boys race in which races in a pinewood derby
 import random
+from optparse import OptionParser
 
 class Boy:
     def __init__(self, id):
@@ -81,18 +82,30 @@ def get_races(numberofboys, racesize, heats):
             break
     return races
 
-def races_to_csv(races, filename):
-    with open(filename, 'w') as file:
-        for race in races:
-            file.write(','.join([str(b.id) for b in race])+'\n')
+def races_to_csv_format(races):
+    result = ''
+    for race in races:
+        result += ','.join([str(b.id) for b in race])+'\n'
+    return result
+
 
 def main():
-    numberofboys = int(raw_input('Number of boys? '))
-    racesize = int(raw_input('Number of boys per race? '))
-    heats = int(raw_input('Minimum number of races for each boy? '))
+    parser = OptionParser(usage="usage: %prog boys race-size heats [options]")
+    parser.add_option("-f", "--file", action="store", dest="filename",
+                      default=None, help="file to save results in as csv")
+
+    options, args = parser.parse_args()
+
+    numberofboys = int(args[0])
+    racesize = int(args[1])
+    heats = int(args[2])
     races = get_races(numberofboys, racesize, heats)
-    filename = raw_input('Output filename? ')
-    races_to_csv(races, filename)
+    csv_format = races_to_csv_format(races)
+    if options.filename:
+        with open(options.filename, 'w') as file:
+            file.write(csv_format)
+    else:
+        print csv_format
 
 if __name__ == '__main__':
     main()
